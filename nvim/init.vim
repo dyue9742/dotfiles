@@ -1,302 +1,333 @@
+filetype plugin on
+syntax enable
+
+set encoding=utf-8
+set fileencoding=utf-8
+
+set shiftwidth=2
+set shiftround
+set tabstop=2
+
+set mouse=a
+
+set nu rnu
+
+set cursorline
+set autoindent
+set ignorecase
+set expandtab
+set incsearch
+set hlsearch
+set wildmenu
+
+set signcolumn=yes:1
+set colorcolumn=80
+set formatoptions=rq
+
+set scrolloff=8
+set cmdheight=2
+set pumheight=10
+set sidescrolloff=4
+
+set nowrap
+set nobackup
+set noswapfile
+set noerrorbells
+set novisualbell
+set nowritebackup
+
 call plug#begin()
-" THEMES
-Plug 'folke/tokyonight.nvim'
+Plug 'catppuccin/nvim', {'as': 'catppuccin'}
 
-" TOOLS
-Plug 'smoka7/hydra.nvim'
-Plug 'smoka7/multicursors.nvim'
-Plug 'psf/black', {'branch': 'stable'}
-Plug 'lukas-reineke/indent-blankline.nvim'
-Plug 'echasnovski/mini.nvim', {'branch': 'stable'}
-Plug 'ggandor/leap.nvim'
-Plug 'folke/trouble.nvim'
-Plug 'folke/which-key.nvim'
-Plug 'nvim-lua/plenary.nvim'
-Plug 'nvim-telescope/telescope.nvim'
-Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
-
-" LSP
-Plug 'L3MON4D3/LuaSnip'
+Plug 'L3MON4D3/LuaSnip', {'tag': 'v2.*', 'do': 'make install_jsregexp'}
 Plug 'hrsh7th/nvim-cmp'
 Plug 'hrsh7th/cmp-nvim-lsp'
 Plug 'neovim/nvim-lspconfig'
 Plug 'williamboman/mason.nvim'
 Plug 'williamboman/mason-lspconfig.nvim'
 
-" UI
+Plug 'tpope/vim-rails'
+Plug 'tpope/vim-endwise'
+Plug 'tpope/vim-fugitive'
+Plug 'tpope/vim-surround'
+Plug 'folke/trouble.nvim'
+
+Plug 'junegunn/fzf', {'do': {->fzf#install()}}
+Plug 'ggandor/leap.nvim'
+Plug 'nvim-lua/plenary.nvim'
+Plug 'mg979/vim-visual-multi', {'branch': 'master'}
 Plug 'nvim-lualine/lualine.nvim'
 Plug 'nvim-tree/nvim-web-devicons'
+Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
 call plug#end()
 
-lua <<EOF
-require 'autoload.option'
+lua << END
 
-require'mini.pairs'.setup {
-	mappings = {
-		["'"] = false,
-	},
-}
-
-require'mini.ai'.setup {}
-
-require'multicursors'.setup {
--- <Esc>     | Returns to multicursor normal mode
--- <C-c>     | Returns to multicursor normal mode
--- <BS>      | Deletes the char before the selections
--- <Del>     | Deletes the char under the selections
--- <Left>    | Moves the selections one char Left
--- <Up>      | Moves the selections one line Up
--- <Right>   | Moves the selections one char Right
--- <Down>    | Moves the selections one line Down
--- <C-Left>  | Moves the selections one word Left
--- <C-Right> | Moves the selections one word Right
--- <Home>    | Moves the selections to start of line
--- <End>     | Moves the selections to end of line
--- <CR>      | Insert one line below the selections
--- <C-j>     | Insert one line below the selections
--- <C-v>     | Pastes the text from system clipboard
--- <C-r>     | Insert the contents of a register
--- <C-w>     | Deletes one word before the selections
--- <C-BS>    | Deletes one word before the selections
--- <C-u>     | Deletes from the start of selections till the start of line
-	hint_config = false,
-}
-
-require'ibl'.setup {}
-
-require'leap'.setup {}
-
-require'lualine'.setup {
-	options = {
-		icons_enabled = true,
-		theme = 'tokyonight',
-		component_separators = { left = '', right = ''},
-		section_separators = { left = '', right = ''},
-		always_divide_middle = true,
-		globalstatus = false,
-		refresh = {
-			statusline = 1000,
-			tabline = 1000,
-			winbar = 1000,
-		}
-	},
-	sections = {
-		lualine_a = {'mode'},
-		lualine_b = {'branch', 'diff', 'diagnostics'},
-		lualine_c = {
-			{'filename', file_status = true, path = 1}
-		},
-		lualine_x = {'filetype'},
-		lualine_y = {'progress'},
-		lualine_z = {'location'}
-	},
-	tabline = {
-		lualine_a = {'buffers'},
-		lualine_b = {},
-		lualine_c = {},
-		lualine_x = {},
-		lualine_y = {},
-		lualine_z = {'tabs'}
-	}
-}
-
-require'mason'.setup {
-    ui = {
-        icons = {
-            package_installed = "✓",
-            package_pending = "➜",
-            package_uninstalled = "✗",
-        },
-    },
-}
+vim.keymap.set('n', '<space>e', vim.diagnostic.open_float)
+vim.keymap.set('n', '<space>q', vim.diagnostic.setloclist)
+vim.keymap.set('n', '[d', vim.diagnostic.goto_prev)
+vim.keymap.set('n', ']d', vim.diagnostic.goto_next)
 
 local cmp = require'cmp'
-local luasnip = require'luasnip'
-
 cmp.setup {
-	sources = {
-		{name = 'nvim_lsp'},
-		{name = 'luasnip'},
-	},
-	mapping = cmp.mapping.preset.insert({
-		['<C-Space>'] = cmp.mapping.complete(),
-		['<C-u>'] = cmp.mapping.scroll_docs(-4),
-		['<C-d>'] = cmp.mapping.scroll_docs(4),
-		['<C-e>'] = cmp.mapping.abort(),
-		['<CR>'] = cmp.mapping.confirm({ select = true }),
-	}),
-	snippet = {
-		expand = function(args)
-			luasnip.lsp_expand(args.body)
-		end
-	},
+  snippet = {
+    expand = function(args)
+      require'luasnip'.lsp_expand(args.body)
+    end,
+  },
+  mapping = cmp.mapping.preset.insert({
+    ['<C-u>'] = cmp.mapping.scroll_docs(-4),
+    ['<C-d>'] = cmp.mapping.scroll_docs(4),
+    ['<C-space>'] = cmp.mapping.complete(),
+    ['<CR>'] = cmp.mapping.confirm {
+      behavior = cmp.ConfirmBehavior.Replace,
+      select = true,
+    },
+    ['<Tab>'] = cmp.mapping(function(fallback)
+      if cmp.visible() then
+        cmp.select_next_item()
+      else
+        fallback()
+      end
+    end, { 'i', 's' }),
+    ['<S-Tab>'] = cmp.mapping(function(fallback)
+      if cmp.visible() then
+        cmp.select_prev_item()
+      else
+        fallback()
+      end
+    end, { 'i', 's' }),
+  }),
+  sources = {
+    { name = 'nvim_lsp' },
+    { name = 'luasnip' },
+  },
 }
 
-local default_capabilities = require'cmp_nvim_lsp'.default_capabilities()
+local capabilities = require'cmp_nvim_lsp'.default_capabilities()
 
--- Use LspAttach autocommand to only map the following keys
--- after the language server attaches to the current buffer
-vim.api.nvim_create_autocmd('LspAttach', {
-  group = vim.api.nvim_create_augroup('UserLspConfig', {}),
-  callback = function(ev)
-    -- Enable completion triggered by <c-x><c-o>
-    vim.bo[ev.buf].omnifunc = 'v:lua.vim.lsp.omnifunc'
+local on_attach = function(_, bufnr)
+  vim.api.nvim_buf_set_option(bufnr, 'omnifunc', 'v:lua.vim.lsp.omnifunc')
 
-    -- Buffer local mappings.
-    -- See `:help vim.lsp.*` for documentation on any of the below functions
-    local opts = { buffer = ev.buf }
-		vim.keymap.set('n', '<leader>[', vim.diagnostic.goto_prev)
-		vim.keymap.set('n', '<leader>]', vim.diagnostic.goto_next)
-		vim.keymap.set('n', '<leader>f', vim.diagnostic.open_float)
-		vim.keymap.set('n', '<leader>l', vim.diagnostic.setloclist)
-		vim.keymap.set('n', '<leader>h', vim.lsp.buf.hover, opts)
-		vim.keymap.set('n', '<leader>R', vim.lsp.buf.rename, opts)
-		vim.keymap.set('n', '<leader>r', vim.lsp.buf.references, opts)
-		vim.keymap.set('n', '<leader>d', vim.lsp.buf.definition, opts)
-		vim.keymap.set('n', '<leader>D', vim.lsp.buf.declaration, opts)
-		vim.keymap.set('n', '<leader>i', vim.lsp.buf.implementation, opts)
-		vim.keymap.set('n', '<leader>f', function()
-			vim.lsp.buf.format { async = false }
-		end, opts)
-	end,
+  local opts = { buffer = bufnr, noremap = true, silent = true }
+  vim.keymap.set('n', 'gH', vim.lsp.buf.hover, opts)
+  vim.keymap.set('n', 'rn', vim.lsp.buf.rename, opts)
+  vim.keymap.set('n', 'gr', vim.lsp.buf.references, opts)
+  vim.keymap.set('n', 'gd', vim.lsp.buf.definition, opts)
+  vim.keymap.set('n', 'gD', vim.lsp.buf.declaration, opts)
+  vim.keymap.set('n', 'gi', vim.lsp.buf.implementation, opts)
+  vim.keymap.set('n', 'gs', vim.lsp.buf.signature_help, opts)
+  vim.keymap.set('n', 'tD', vim.lsp.buf.type_definition, opts)
+  vim.keymap.set('n', '<space>wa', vim.lsp.buf.add_workspace_folder, opts)
+  vim.keymap.set('n', '<space>wr', vim.lsp.buf.remove_workspace_folder, opts)
+  vim.keymap.set('n', '<space>wl', function ()
+    print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
+  end, opts)
+end
+
+require'mason'.setup()
+
+require'mason-lspconfig'.setup({
+  ensure_installed = {
+    "kotlin_language_server",
+    "rust_analyzer",
+    "clojure_lsp",
+    "solargraph",
+    "tsserver",
+    "pyright",
+    "lua_ls",
+    "clangd",
+    "cmake",
+    "gopls",
+    "jdtls",
+    "hls",
+    "als",
+  }
 })
 
-local ensure_installed_dict = {
-	'asm_lsp',
-	'awk_ls',
-	'lua_ls',
-	'hls',
-	'cmake',
-	'gopls',
-	'jdtls',
-	'eslint',
-	'clangd',
-	'pyright',
-	'tsserver',
-	'opencl_ls',
-	'omnisharp',
-	'solargraph',
-	'rust_analyzer',
+require'mason-lspconfig'.setup_handlers {
+  ["als"] = function (...)
+    require'lspconfig'.als.setup {
+      on_attach = on_attach,
+      capabilities = capabilities,
+      settings = {
+        ada = {
+          projectFile = "project.gpr";
+          scenarioVariables = { ... };
+        }
+      }
+    }
+  end,
+  ["hls"] = function ()
+    require'lspconfig'.hls.setup {
+      filetypes = { "haskell", "lhaskell", "cabal" },
+    }
+  end,
+  ["cmake"] = function ()
+    require'lspconfig'.cmake.setup {
+      on_attach = on_attach,
+      capabilities = capabilities,
+    }
+  end,
+  ["gopls"] = function ()
+    require'lspconfig'.gopls.setup {
+      on_attach = on_attach,
+      capabilities = capabilities,
+      settings = {
+        gopls = {
+          analyses = {
+            unusedparams = true,
+          },
+          staticcheck = true,
+          gofumpt = true,
+        }
+      }
+    }
+  end,
+  ["lua_ls"] = function ()
+    require'lspconfig'.lua_ls.setup {
+      on_attach = on_attach,
+      capabilities = capabilities,
+      on_init = function(client)
+        local path = client.workspace_folders[1].name
+        if vim.loop.fs_stat(path..'/.luarc.json') or vim.loop.fs_stat(path..'/.luarc.jsonc') then
+          return
+        end
+        client.config.settings.Lua = vim.tbl_deep_extend('force', client.config.settings.Lua, {
+          runtime = {
+            version = 'LuaJIT'
+          },
+          workspace = {
+            checkThirdParty = false,
+            library = {
+              vim.run.VIMRUNTIME
+            }
+          }
+        })
+      end,
+      settings = {
+        Lua = {
+          diagnostics = {
+            globals = { "vim", "love" }
+          }
+        }
+      }
+    }
+  end,
+  ["clangd"] = function ()
+    require'lspconfig'.clangd.setup {
+      on_attach = on_attach,
+      capabilities = capabilities,
+    }
+  end,
+  ["pyright"] = function ()
+    require'lspconfig'.pyright.setup {
+      on_attach = on_attach,
+      capabilities = capabilities,
+
+    }
+  end,
+  ["tsserver"] = function ()
+    require'lspconfig'.tsserver.setup {
+      on_attach = on_attach,
+      capabilities = capabilities,
+    }
+  end,
+  ["solargraph"] = function ()
+    require'lspconfig'.solargraph.setup {
+      on_attach = on_attach,
+      capabilities = capabilities,
+    }
+  end,
+  ["rust_analyzer"] = function ()
+    require'lspconfig'.rust_analyzer.setup {
+      on_attach = on_attach,
+      capabilities = capabilities,
+      settings = {
+        ['rust-analyzer'] = {
+          diagnostics = {
+            enable = false;
+          }
+        }
+      }
+    }
+  end,
 }
 
-local handlers = {}
-
-for _, v in pairs(ensure_installed_dict) do
-	handlers[v] = function ()
-		require'lspconfig'[v].setup {
-			capabilities = default_capabilities
-		}
-	end
-end
-
-handlers['lua_ls'] = function ()
-	require'lspconfig'['lua_ls'].setup {
-		capabilities = default_capabilities,
-		settings = {
-			Lua = {
-				format = {
-					enable = true,
-					defaultConfig = {
-						indent_style = 'space',
-						indent_size = '2',
-					}
-				},
-				diagnostics = {
-					globals = {'vim', 'love'},
-				},
-			},
-		},
-	}
-end
-
-
-require'mason-lspconfig'.setup {
-	ensure_installed = ensure_installed_dict,
-	handlers = handlers,
+require'nvim-treesitter.configs'.setup{
+  ensure_installed = {
+    "c",
+    "r",
+    "go",
+    "ada",
+    "asm",
+    "cpp",
+    "lua",
+    "sql",
+    "tsx",
+    "vim",
+    "cuda",
+    "html",
+    "java",
+    "json",
+    "make",
+    "perl",
+    "ruby",
+    "rust",
+    "toml",
+    "yaml",
+    "cmake",
+    "ocaml",
+    "regex",
+    "scala",
+    "erlang",
+    "kotlin",
+    "groovy",
+    "python",
+    "haskell",
+    "dockerfile",
+    "javascript",
+    "typescript",
+  },
+  indent = { enable = true },
+  highlight = { enable = true },
 }
 
-require'nvim-treesitter.configs'.setup {
-	ensure_installed = {
-		'c',
-		'go',
-		'cpp',
-		'css',
-		'lua',
-		'tsx',
-		'vim',
-		'cuda',
-		'fish',
-		'json',
-		'llvm',
-		'make',
-		'perl',
-		'rust',
-		'toml',
-		'yaml',
-		'cmake',
-		'ocaml',
-		'regex',
-		'scala',
-		'swift',
-		'erlang',
-		'elixir',
-		'groovy',
-		'haskell',
-		'c_sharp',
-		'javascript',
-		'typescript',
-	},
-	indent = {
-		enable = true
-	},
-	highlight = {
-		enable = true,
-	},
-}
+require'lualine'.setup{}
 
-require'telescope'.setup {
-	defaults = {
-		mappings = {
-			i = {
-				["<leader>h"] = "which_key",
-			},
-		},
-	},
-}
+require'leap'.create_default_mappings()
 
-require'tokyonight'.setup {
-	options = {
-		style = "night",
-		styles = {
-			comments = { italic = false },
-			keywords = { italic = false },
-		},
-	},
-}
+END
 
-require'trouble'.setup {}
+let g:fzf_colors =
+\ { 'fg':      ['fg', 'Normal'],
+  \ 'bg':      ['bg', 'Normal'],
+  \ 'hl':      ['fg', 'Comment'],
+  \ 'fg+':     ['fg', 'CursorLine', 'CursorColumn', 'Normal'],
+  \ 'bg+':     ['bg', 'CursorLine', 'CursorColumn'],
+  \ 'hl+':     ['fg', 'Statement'],
+  \ 'info':    ['fg', 'PreProc'],
+  \ 'border':  ['fg', 'Ignore'],
+  \ 'prompt':  ['fg', 'Conditional'],
+  \ 'pointer': ['fg', 'Exception'],
+  \ 'marker':  ['fg', 'Keyword'],
+  \ 'spinner': ['fg', 'Label'],
+  \ 'header':  ['fg', 'Comment'] }
+let g:fzf_layout = { 'down': '60%' }
+autocmd! FileType fzf
+autocmd  FileType fzf set laststatus=0 noshowmode noruler
+  \| autocmd BufLeave <buffer> set laststatus=2 showmode ruler
 
-require'which-key'.setup {}
-EOF
+autocmd BufWritePre * :%s/\s\+$//e
 
-colorscheme tokyonight
+nnoremap <leader>xx <cmd>TroubleToggle<cr>
+nnoremap <leader>xl <cmd>TroubleToggle loclist<cr>
+nnoremap <leader>xq <cmd>TroubleToggle quickfix<cr>
+nnoremap <leader>xd <cmd>TroubleToggle document_diagnostics<cr>
+nnoremap <leader>xw <cmd>TroubleToggle workspace_diagnostics<cr>
 
-nnoremap <leader>tx <cmd>TroubleToggle<cr>
-nnoremap <leader>tl <cmd>TroubleToggle loclist<cr>
-nnoremap <leader>tf <cmd>TroubleToggle quickfix<cr>
-nnoremap <leader>tr <cmd>TroubleToggle lsp_references<cr>
-nnoremap <leader>td <cmd>TroubleToggle document_diagnostics<cr>
-nnoremap <leader>tw <cmd>TroubleToggle workspace_diagnostics<cr>
+nnoremap [b :bp<CR>
+nnoremap ]b :bn<CR>
+nnoremap bs :ls<CR>
 
-nnoremap <leader>fb <cmd>lua require('telescope.builtin').buffers()<cr>
-nnoremap <leader>fg <cmd>lua require('telescope.builtin').live_grep()<cr>
-nnoremap <leader>fh <cmd>lua require('telescope.builtin').help_tags()<cr>
-nnoremap <leader>ff <cmd>lua require('telescope.builtin').find_files()<cr>
-
-nnoremap <leader>[b :bprev<CR>
-nnoremap <leader>]b :bnext<CR>
-
-augroup black_on_save
-	autocmd!
-	autocmd BufWritePre *.py Black
-augroup end
+colorscheme catppuccin-mocha
