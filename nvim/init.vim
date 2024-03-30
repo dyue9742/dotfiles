@@ -271,6 +271,7 @@ require'nvim-treesitter.configs'.setup{
     "java",
     "json",
     "make",
+    "objc",
     "perl",
     "ruby",
     "rust",
@@ -329,5 +330,7 @@ nnoremap <leader>xw <cmd>TroubleToggle workspace_diagnostics<cr>
 nnoremap [b :bp<CR>
 nnoremap ]b :bn<CR>
 nnoremap bs :ls<CR>
+
+nnoremap <leader>p :echo expand('%:p')<CR>
 
 colorscheme catppuccin-mocha

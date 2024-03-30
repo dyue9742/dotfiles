@@ -14,6 +14,8 @@ set laststatus=2
 
 set expandtab
 set autoindent
+set cursorline
+set cursorcolumn
 
 set shiftround
 set shiftwidth=2
@@ -32,37 +34,33 @@ set termguicolors
 
 call plug#begin()
 Plug 'junegunn/fzf', {'do': { -> fzf#install()} }
-Plug 'Yggdroot/indentLine'
 Plug 'itchyny/lightline.vim'
 Plug 'mg979/vim-visual-multi', {'branch': 'master'}
-
-Plug 'psf/black', {'branch': 'stable'}
 
 Plug 'fatih/vim-go', {'do': ':GoUpdateBinaries'}
 Plug 'vim-ruby/vim-ruby'
 Plug 'rust-lang/rust.vim'
 
-Plug 'sheerun/vim-polyglot'
 Plug 'bfrg/vim-cpp-modern'
+Plug 'vim-python/python-syntax'
 Plug 'HerringtonDarkholme/yats.vim'
 
 Plug 'lifepillar/vim-solarized8'
 call plug#end()
 
 
+autocmd BufNewFile,BufReadPost *.m set filetype=objc
+
 let g:fzf_layout = { 'down': '30%' }
 autocmd! FileType fzf
 autocmd  FileType fzf set laststatus=0 noshowmode noruler
   \| autocmd BufLeave <buffer> set laststatus=2 showmode ruler
 
-let g:indentLine_enabled = 0
-let g:indentLine_char_list = ['|', '¦']
-
 let g:lightline = {
       \ 'colorscheme': 'solarized',
       \ }
 
-let g:black_use_virtualenv = 0
+let g:python_highlight_all = 1
 
 let g:go_highlight_build_constraints = 1
 let g:go_highlight_extra_types = 1
