@@ -1,9 +1,5 @@
-(setq frame-resize-pixelwise t)
-(set-frame-position nil 0 0)
-(set-frame-size nil (display-pixel-width) (display-pixel-height) t)
-
 (set-face-attribute 'default nil :family "Hack Nerd Font")
-(set-face-attribute 'default nil :height 200)
+(set-face-attribute 'default nil :height 234)
 
 (menu-bar-mode -1)
 (tool-bar-mode -1)
@@ -45,11 +41,11 @@
 
 (add-hook 'before-save-hook 'delete-trailing-whitespace)
 
-(setq-default tab-width 4
-	      fill-column 80
-	      create-lockfiles nil
-	      indent-tabs-mode nil
-	      make-backup-files nil)
+(setq-default tab-width 4)
+(setq-default fill-column 80)
+(setq-default create-lockfiles nil)
+(setq-default indent-tabs-mode nil)
+(setq-default make-backup-files nil)
 
 
 (require 'package)
@@ -57,76 +53,36 @@
              '("melpa" . "https://melpa.org/packages/") t)
 (package-initialize)
 
-(when (not (package-installed-p 'use-package))
-  (package-refresh-contents)
-  (package-install 'use-package))
-
-(use-package helm
+(use-package timu-rouge-theme
   :ensure t
   :config
-  (global-set-key (kbd "M-x") #'helm-M-x)
-  (global-set-key (kbd "C-x C-f") #'helm-find-files)
-  (global-set-key (kbd "C-x r b") #'helm-filtered-bookmarks)
-  (helm-mode 1))
+  (load-theme 'timu-rouge t))
 
-(use-package magit
-  :ensure t
-  :init (global-set-key (kbd "C-x g") 'magit-status))
+(use-package tree-sitter
+             :ensure t)
+(use-package tree-sitter-langs
+             :ensure t)
+(global-tree-sitter-mode)
 
-(use-package company
-  :ensure t
-  :init (add-hook 'after-init-hook 'global-company-mode))
+(use-package helm
+             :ensure t)
+
+(use-package lsp-mode
+             :ensure t
+             :init
+             (setq lsp-keymap-prefix "C-c l"))
 
 (use-package flycheck
   :ensure t
-  :init (global-flycheck-mode))
-
-(use-package yasnippet
-  :ensure t
-  :init (yas-global-mode 1))
-
-(use-package lsp-mode
-  :init
-  (setq lsp-keymap-prefix "C-c l")
-  :commands lsp)
-(use-package lsp-ui
-  :ensure t)
-
-(use-package tree-sitter)
-(use-package tree-sitter-langs)
-(global-tree-sitter-mode)
-(add-hook 'tree-sitter-after-on-hook #'tree-sitter-hl-mode)
-
-(use-package timu-rouge-theme
-  :ensure t
-  :config (load-theme 'timu-rouge t))
-
-(use-package multiple-cursors
   :config
-  (setq mc/always-run-for-all t)
-  :bind
-  ;; Use multiple cursor bindings only when a region is active
-  (:map region-bindings-mode-map
-        ("C->" . mc/mark-next-like-this)
-        ("C-<" . mc/mark-previous-like-this)
-        ("C-c a" . mc/mark-all-like-this)
-        ("C-c h" . mc-hide-unmatched-lines-mode)
-        ("C-c l" . mc/edit-lines)))
-
-(use-package which-key)
-(which-key-mode)
-(which-key-setup-side-window-bottom)
-
-(use-package rainbow-delimiters
-  :ensure t)
-(add-hook 'prog-mode-hook #'rainbow-delimiters-mode)
+  (add-hook 'after-init-hook #'global-flycheck-mode))
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
-   '(yasnippet flycheck company magit which-key web-mode typescript-mode tree-sitter-langs timu-rouge-theme rust-mode rainbow-delimiters multiple-cursors lua-mode lsp-mode js3-mode indent-guide haskell-mode go-mode elixir-mode cmake-mode)))
+   '(timu-rouge-theme flycheck helm tree-sitter-langs tree-sitter)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
