@@ -9,6 +9,7 @@ vim.o.shiftwidth = 4
 vim.o.nu = true
 vim.o.rnu = true
 vim.o.cul = true
+vim.o.conf = true
 
 vim.o.nobk = true
 vim.o.nosf = true
@@ -17,9 +18,13 @@ vim.o.nowb = true
 vim.o.nowrap = true
 vim.o.hidden = true
 
-vim.cmd.highlight({ 'LineNrAbove', 'ctermfg=darkgrey' })
-vim.cmd.highlight({ 'LineNrBelow', 'ctermfg=darkgrey' })
+vim.opt.wildignore = { '__pycache__', 'node_modules' }
 
+vim.api.nvim_create_autocmd('TextYankPost', {
+    callback = function()
+        vim.highlight.on_yank()
+    end
+})
 
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 if not (vim.uv or vim.loop).fs_stat(lazypath) then
@@ -161,4 +166,7 @@ vim.api.nvim_create_autocmd('LspAttach', {
 })
 
 
-vim.cmd([[colorscheme gruvbox8]])
+vim.cmd("colorscheme kanagawa")
+
+-- vim.cmd.highlight({ 'LineNrAbove', 'ctermfg=darkgrey' })
+-- vim.cmd.highlight({ 'LineNrBelow', 'ctermfg=darkgrey' })

@@ -1,3 +1,6 @@
+;;; package --- Settings
+;;; Commentary:
+;;; Code:
 (set-face-attribute 'default nil :family "Hack Nerd Font")
 (set-face-attribute 'default nil :height 234)
 
@@ -7,6 +10,9 @@
 
 (column-number-mode t)
 
+;; Local Variables:
+;; byte-compile-warnings: (not free-vars)
+;; End:
 (setq display-line-numbers-type 'relative)
 (global-display-line-numbers-mode)
 
